@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>发送短信倒计时</title>
+    <script src='./../js/jquery-1.11.3.min.js'></script>
+</head>
+
+<body>
+    <script>
+    /**
+     * [SendCode 短信验证码]
+     * @Author zhulu
+     * @Date   2017-03-08
+     * @param  {[type]}   obj   [绑事件的dom元素]
+     * @param  {[type]}   fAjax [发送短信验证码的ajax方法]
+     * @param  {[type]}   count [间隔时间，未设置为60s]
+     */
+    var SendCode = function(dom, fAjax, count) {
+        var self = this;
+        self.obj = dom;
+        self.count = count || 60; //间隔函数，1秒执行
+        self.fAjax = (typeof fAjax === 'function') ? fAjax : false;
+        if(!self.fAjax){
+        	alert('fAjax need function');
+        	return;
+        }
+        var interValObj; //timer变量，控制时间
+        var curCount; //当前剩余秒数;
+        self.obj.on("click", function() {
+            self.sendMessage();
+        })
+        this.sendMessage = function() {
+                curCount = self.count;　　 //设置button效果，开始计时
+                self.obj.attr("disabled", "true");
+                self.obj.val("请在" + curCount + "秒内输入验证码");
+                interValObj = window.setInterval(this.setRemainTime, 1000); //启动计时器，1秒执行一次
+                self.fAjax();//向后台发送处理数据
+            }
+            //timer处理函数
+        this.setRemainTime = function() {
+            if (curCount == 0) {
+                window.clearInterval(interValObj); //停止计时器
+                self.obj.removeAttr("disabled"); //启用按钮
+                self.obj.val("重新发送验证码");
+            } else {
+                curCount--;
+                self.obj.val("请在" + curCount + "秒内输入验证码");
+            }
+        }
+    }
+    </script>
+    <input id="btnSendCode" type="button" value="发送验证码" />
+    <script>
+    $(function() {
+        var fAjax = function(){
+        	console.info(1)
+        }
+        var sendCode = new SendCode($("#btnSendCode"), fAjax);
+    })
+
+    </script>
+</body>
+
+</html>
